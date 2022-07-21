@@ -1,0 +1,10 @@
+select sum(balance) as sum_balance from bank_details
+select avg(balance) as avg_balance from bank_details
+select min(balance) as min_balance from bank_details
+select max(balance) as min_balance from bank_details
+select * from bank_details where loan = "yes"
+select avg(balance) as avg_balance from bank_details where job = "admin."
+select age,marital,education,`default`,balance,housing,loan,contact,`day`,`month`,duration,campaign,pdays,previous,poutcome,y from  bank_details where age<45
+select * from bank_details where education = "primary" and  job = "retired"
+select * from bank_details where balance like "-%"
+select balance,housing from bank_details where housing = "no"
