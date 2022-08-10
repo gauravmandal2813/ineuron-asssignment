@@ -1,0 +1,56 @@
+#1th task 
+#Create a loop for a table to insert a record into a tale for two columns in first coumn you have to inset a data ranging from 1 to 100 and in second column you hvae to inset a square of the first column 
+
+create table loop_table00( first_column int,square_column int);
+create table loop09_table(val12 int,square1_column int)
+Delimiter $$
+create procedure insert_data100()
+Begin
+set @str  = 1 ;
+make_data15 : loop
+insert into loop02_table(val12,square1_column) values (@str,@str*@str);
+set @str = @str + 1  ;
+if @str  = 100 then 
+	leave make_data15;
+end if ;
+end loop make_data15;
+End $$
+
+#2th task 
+#create a user defined function to find out a date differences in number of days 
+DELIMITER $$ 
+create function number_of_days11 (end_date date,start_date date)
+returns int
+DETERMINISTIC
+begin
+     declare date_difference int ;
+    SET date_difference = DATEDIFF(end_date,start_date);
+    return date_difference;
+END $$
+select number_of_days11("2022/04/04","2022/04/02");
+
+
+#3rd task
+# create a UDF to find out a log base 10 of any given number 
+DELIMITER $$ 
+create function log10_base(enter_number int)
+returns int
+DETERMINISTIC
+begin
+     declare value_of_log10 int ;
+     set value_of_log10 =  log10(enter_number);
+     return value_of_log10;
+END $$
+
+
+# 5th task 
+#5 task
+#create a procedure to find out  5th highest profit in your sales table you dont have to use rank and windowing function 
+DELIMITER $$ 
+create procedure highest_profit5th( )
+begin 
+     select * from sales14 group by sales order by sales desc
+limit 5;
+END $$
+
+# i am not able to solve the error of 4th task after given lot's of efforts
