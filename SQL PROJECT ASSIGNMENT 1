@@ -1,0 +1,183 @@
+--first task--
+create database gm_database12;
+create table shopping_history(
+Product_name varchar not null,
+Quantity integer not null,
+unit_price integer not null
+);
+select * from shopping_history;
+
+insert into shopping_history values
+('milk',3,10),
+('bread',2,7),
+('milk',2,7),
+('milk',1,4),
+('bread',1,2),
+('milk',1,2),
+('milk',2,4),
+('milk',1,3),
+('bread',3,10),
+('bread',2,5),
+('bread',2,7);
+ 
+select sum(unit_price),Product_name from shopping_history
+group by PRODUCT_NAME;
+
+
+
+
+
+
+---2nd_task---
+create table phone(
+name varchar(10) not null unique,
+phone_number integer not null unique);
+
+insert into phone(name,phone_number)
+values('jack',1234),
+('lena',3333),
+('mark',9999),
+('anna',7582)
+ 
+select * from phone;
+
+
+create table calls(
+id integer not null,
+caller integer not null,
+callee integer not null,
+duration integer not null)
+select * from calls;
+
+insert into calls (id,caller,callee,duration)
+values(25,1234,7582,8),
+(7,9999,7582,1),
+(18,9999,3333,1),
+(21,7582,3333,3),
+(3,3333,1234,1),
+(21,7582,1290,8),
+(25,1234,3671,10),
+(21,7582,2345,15),
+(25,1234,1235,8),
+(21,7582,5678,9);
+
+select caller,sum(DURATION) from calls group by caller;
+
+select phone.name from phone join calls on phone.PHONE_NUMBER = calls.caller
+group by phone.name
+having sum(duration) >=10
+order by name 
+
+
+---------------------------------------------------------------------------
+---3rd task---
+
+create table transactions(
+  amount integer not null,
+  date DATE  not null
+);
+
+insert into transactions(amount,date)
+values(1000,'2020-01-06'),
+(-10,'2020-01-14'),
+(-75,'2020-01-20'),
+(-5,'2020-01-25'),
+( -4,'2020-01-29'),
+( 2000,'2020-03-10'),
+( -75,'2020-03-12'),
+( -20,'2020-03-15'),
+( 40,'2020-03-15'),
+( -50,'2020-03-17'),
+( -200,'2020-10-10'),
+(  200,'2020-10-10');
+
+
+select * from transactions;
+
+WITH CREDITS AS 
+(SELECT M,SUM(AMOUNT)AS TOTAL FROM (SELECT AMOUNT, YEAR(DATE) AS Y, MONTH(DATE) AS M FROM TRANSACTIONS WHERE AMOUNT<0 ORDER BY Y,M)
+GROUP BY M,Y
+HAVING TOTAL<-100
+ORDER BY M,Y)
+SELECT SUM(AMOUNT)-((12-(SELECT COUNT(*) AS NON_CHARGES FROM CREDITS))*5) AS BALANCE FROM TRANSACTIONS;
+
+
+/*
+STEP 1:TASK TO FIND OUT CREDITS
+*/
+WITH CREDITS AS (SELECT AMOUNT, YEAR(DATE) AS Y, MONTH(DATE) AS M FROM TRANSACTIONS WHERE AMOUNT<0 ORDER BY Y,M);
+
+/*
+STEP 2:TASK TO FIND OUT SUM OF CREDITS MONTHLY
+*/
+SELECT  M ,SUM(AMOUNT)AS TOTAL FROM transactions
+GROUP BY M,Y;
+
+/*
+ALTERNATE METHOD WHEN CRITERIA IS GREATER THAN 3 TRANSACTION AND SUM OF CREDIT IS GREATER THAN 100
+*/
+
+/*    STEP 1:   */
+
+WITH CRED_TABLE AS (SELECT AMOUNT, YEAR(DATE) AS Y, MONTH(DATE) AS M FROM TRANSACTIONS WHERE AMOUNT<0 ORDER BY Y,M)
+SELECT COUNT(AMOUNT) AS TOTAL_TRANS, SUM(AMOUNT) AS TOTAL_CREDIT FROM CRED_TABLE GROUP BY Y,M;
+
+/*    STEP 2:   */
+
+WITH M_CRED AS (WITH CRED_TABLE AS (SELECT AMOUNT, YEAR(DATE) AS Y, MONTH(DATE) AS M FROM TRANSACTIONS WHERE AMOUNT<0 ORDER BY Y,M)
+SELECT COUNT(AMOUNT) AS TOTAL_TRANS, SUM(AMOUNT) AS TOTAL_CREDIT FROM CRED_TABLE GROUP BY Y,M HAVING TOTAL_TRANS>=3 AND TOTAL_CREDIT<=-100)
+SELECT SUM(AMOUNT)-(5*(12-(SELECT COUNT(TOTAL_TRANS) FROM M_CRED))) AS BALANCE FROM TRANSACTIONS;
+
+/* ONE MORE */
+
+WITH DESIRED_TABLE AS (SELECT SUM(AMOUNT) AS TOTAL_TRANS,COUNT(AMOUNT) AS NO_OF_TRANS
+FROM TRANSACTIONS
+WHERE AMOUNT<0
+GROUP BY YEAR(DATE),MONTH(DATE)
+HAVING TOTAL_TRANS<=-100 AND NO_OF_TRANS>=3)
+SELECT SUM(AMOUNT)-(5*(12-(SELECT COUNT(*) FROM DESIRED_TABLE))) AS BALANCE FROM TRANSACTIONS;
+
+
+------- TASK 3.2 -------     
+
+
+TRUNCATE TRANSACTIONS;
+
+INSERT INTO TRANSACTIONS VALUES (1,'2020-06-29'),
+(35,'2020-02-20'),
+(-50,'2020-02-03'),
+(-1,'2020-02-26'),
+(-200,'2020-08-01'),
+(-44,'2020-02-07'),
+(-5,'2020-02-25'),
+(1,'2020-06-29'),
+(1,'2020-06-29'),
+(-100,'2020-12-29'),
+(-100,'2020-12-30'),
+(-100,'2020-12-31');
+
+WITH DESIRED_TABLE AS (SELECT SUM(AMOUNT) AS TOTAL_TRANS,COUNT(AMOUNT) AS NO_OF_TRANS
+FROM TRANSACTIONS
+WHERE AMOUNT<0
+GROUP BY YEAR(DATE),MONTH(DATE)
+HAVING TOTAL_TRANS<=-100 AND NO_OF_TRANS>=3)
+SELECT SUM(AMOUNT)-(5*(12-(SELECT COUNT(*) FROM DESIRED_TABLE))) AS BALANCE FROM TRANSACTIONS;
+
+
+-------TASK 3.3-------     
+
+TRUNCATE TRANSACTIONS;
+
+INSERT INTO TRANSACTIONS VALUES (6000,'2020-04-03'),
+(5000,'2020-04-02'),
+(4000,'2020-04-01'),
+(3000,'2020-03-01'),
+(2000,'2020-02-01'),
+(1000,'2020-01-01');
+
+WITH DESIRED_TABLE AS (SELECT SUM(AMOUNT) AS TOTAL_TRANS,COUNT(AMOUNT) AS NO_OF_TRANS
+FROM TRANSACTIONS
+WHERE AMOUNT<0
+GROUP BY YEAR(DATE),MONTH(DATE)
+HAVING TOTAL_TRANS<=-100 AND NO_OF_TRANS>=3)
+SELECT SUM(AMOUNT)-(5*(12-(SELECT COUNT(*) FROM DESIRED_TABLE))) AS BALANCE FROM TRANSACTIONS;
